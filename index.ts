@@ -1,6 +1,9 @@
 import express from 'express'
+
 import adminRoutes from './src/routes/admin.route.ts'
 import authRoutes from './src/routes/auth.route.ts'
+
+
 const app = express()
 const port = 3000
 
