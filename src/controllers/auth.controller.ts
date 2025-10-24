@@ -2,6 +2,7 @@ import { type Request, type Response, type NextFunction } from 'express';
 
 import jwt from 'jsonwebtoken'
 import { AddUser } from '../db/dummy.db.ts';
+import User from '../type/User.ts';
 
 export function isLogged(req: Request, res: Response, next: NextFunction) {
     // TODO: implemente logic
@@ -26,7 +27,15 @@ export function login(req: Request, res: Response, next: NextFunction) {
 
 export function register(req: Request, res: Response, next: NextFunction) {
     // TODO: implement register logic here
-    AddUser()
+    const user: User = {
+        id: "",
+        name: "",
+        joined: "",
+        password: "",
+        phone: "",
+        status: 'created'
+    }
+    AddUser(user)
 }
 
 export function changePassword(req: Request, res: Response, next: NextFunction) {

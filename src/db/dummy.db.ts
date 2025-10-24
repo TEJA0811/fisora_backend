@@ -1,7 +1,8 @@
-const user: string[] = []
+import User  from "../type/User.ts"
+
+const users: User[] = []
 
 
-export function AddUser() {
-    user.push("new user")
-    console.log(user)
+export function AddUser(user: User) {
+    users.push(user)
 }

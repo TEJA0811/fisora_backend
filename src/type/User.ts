@@ -1,8 +1,10 @@
-export interface User {
+interface User {
     id: string;
     name: string;
     phone: string;
     password: string;
-    joined: Date;
+    joined: string;
     status: 'created' | 'verified'
 }
+
+export default User

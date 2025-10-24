@@ -9,7 +9,18 @@ export function loginValidation(req: Request, res: Response, next: NextFunction)
 
 export function registerValidation(req: Request, res: Response, next: NextFunction) {
     // TODO: put validation
-    next()
+
+    // TODO: validate phone number
+    // TODO: validate password 
+    var isValide = true 
+    var error = "Invalide phone number"
+
+    if(isValide) {
+        next()
+    } else {
+        return res.status(401).json({ message: error });
+    }
+
 }
 
 export function OTPValidation(req: Request, res: Response, next: NextFunction) {
