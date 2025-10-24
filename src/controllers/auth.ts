@@ -1,6 +1,5 @@
-import pkg from 'express';
-const { Response, Request, NextFunction } = pkg;
-// import { Response, Request, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
+
 import jwt from 'jsonwebtoken'
 
 export function verifyAuth(req: Request, res: Response, next: NextFunction) {
