@@ -7,3 +7,5 @@ GET {{BASE_URL}}
 ####
 POST {{BASE_URL}}/login
 
+####
+POST {{BASE_URL}}/signup
