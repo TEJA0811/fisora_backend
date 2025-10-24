@@ -1,9 +1,34 @@
-// TODO: login
+import express from 'express'
+const router = express.Router()
 
-// TODO: change password
 
-// TODO: add fish
+router.post('/admin_login', (req, res) => {
+  res.send('login')
+})
 
-// TODO: Update fish by id
+router.post('/admin_change_password', (req, res) => {
+  res.send('change_password')
+})
 
-// TODO: delete fish by id
+router.post('/add_fish', (req, res) => {
+  res.send('add_fish')
+})
+
+router.post('/update_fish', (req, res) => {
+  res.send('pdate_fish')
+})
+
+router.delete('/fish', (req, res) => {
+  res.send('delet fish')
+})
+
+
+// middleware that is specific to this router
+const timeLog = (req: any, res: any, next: any) => {
+  console.log('Time: ', Date.now())
+  next()
+}
+
+router.use(timeLog)
+
+export default router

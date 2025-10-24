@@ -4,4 +4,5 @@ export interface User {
     phone: string;
     password: string;
     joined: Date;
+    status: 'created' | 'verified'
 }

@@ -1,20 +1,13 @@
 import express from 'express'
-import verifyAuth from './src/controllers/auth.ts';
-import fishList from './src/dummy/fishlist.json' with { type: 'json' };
-
+import adminRoutes from './src/routes/admin.route.ts'
+import authRoutes from './src/routes/auth.route.ts'
 const app = express()
 const port = 3000
 
 app.use('/static', express.static('public'))
 
-app.get('/', (req, res) => {
-  res.send(fishList)
-})
-
-
-app.get('/user', verifyAuth, (req, res) => {
-  res.send('Got a PUT request at /user')
-})
+app.use('/', adminRoutes);
+app.use('/', authRoutes);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
