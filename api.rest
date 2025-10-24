@@ -1,0 +1,10 @@
+@BASE_URL = http://localhost:3000/
+
+GET {{BASE_URL}}
+####
+
+
+GET http://localhost:3000/
+
+####
+GET http://localhost:3000/static/test.css
