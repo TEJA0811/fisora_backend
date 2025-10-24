@@ -1,35 +1,31 @@
 import express from 'express'
 const router = express.Router()
 
+import {
+    registerValidation,
+    loginValidation,
+    updatePasswordValidation,
+    OTPValidation,
+    getOTPValidation
+} from '../validation/auth.validation.ts'
 
-// TODO:  Login API (OTP and Password)
-router.post('/login', (req, res) => {
-  res.send('login')
-})
+import {
+    changePassword,
+    getOtp,
+    login,
+    register,
+    verifyOTP
+} from '../controllers/auth.controller.ts'
 
+router.post('/login', loginValidation, login)
 
-// TODO: register API
-router.post('/signup', (req, res) => {
-  res.send('login')
-})
+router.post('/signup', registerValidation, register)
 
+router.post('/change_password', updatePasswordValidation, changePassword)
 
-// TODO: rest password API
-router.post('/change_password', (req, res) => {
-  res.send('change_password')
-})
+router.post('/verify_otp', OTPValidation, verifyOTP)
 
-
-// TODO: Verify otp API
-router.post('/verify_otp', (req, res) => {
-    res.send('verify_otp')
-})
-
-
-// TODO: Get otp API
-router.post('/get_otp', (req, res) => {
-    res.send('get_otp')
-})
+router.post('/get_otp', getOTPValidation, getOtp)
 
 
 export default router
