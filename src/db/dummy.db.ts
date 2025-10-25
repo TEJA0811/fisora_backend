@@ -1,4 +1,4 @@
-import User  from "../type/User.ts"
+import { type User }  from "../type/User.ts"
 
 const users: User[] = []
 

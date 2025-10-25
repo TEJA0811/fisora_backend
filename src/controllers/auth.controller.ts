@@ -2,7 +2,8 @@ import { type Request, type Response, type NextFunction } from 'express';
 
 import jwt from 'jsonwebtoken'
 import { AddUser } from '../db/dummy.db.ts';
-import User from '../type/User.ts';
+
+import type { User } from '../type/User.ts';
 
 export function isLogged(req: Request, res: Response, next: NextFunction) {
     // TODO: implemente logic

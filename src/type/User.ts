@@ -1,4 +1,4 @@
-interface User {
+export interface User {
     id: string;
     name: string;
     phone: string;
@@ -6,5 +6,3 @@ interface User {
     joined: string;
     status: 'created' | 'verified'
 }
-
-export default User
