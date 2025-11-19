@@ -58,17 +58,9 @@ export function registerValidation(
 
   const errors: string[] = [];
 
-  // name: required, at least 2 chars
-  if (!name) {
-    errors.push("name is required");
-  } else if (name.length < 2) {
-    errors.push("name must be at least 2 characters");
-  }
 
   // email: required and basic format
-  if (!email) {
-    errors.push("email is required");
-  } else {
+  if (email){
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       errors.push("email must be a valid email address");
@@ -111,6 +103,7 @@ export function registerValidation(
   // sanitize and put back cleaned values
   req.body.name = name;
   req.body.email = email;
+  req.body.password = password;
   // phone is already normalized above
 
   next();

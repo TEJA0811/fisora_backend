@@ -1,21 +1,15 @@
-import { type Request, type Response, type NextFunction } from "express";
+import { type Request, type Response, type NextFunction } from 'express';
 
 import {
   registerUser,
   loginUser,
   refreshAccessToken,
   revokeRefreshToken,
-} from "../services/auth.service.js";
-import jwt from "jsonwebtoken";
-import type { User } from "../type/User.js";
+} from '../services/auth.service';
 
 export async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const { phone, password } = req.body ?? {};
-    if (!phone || !password)
-      return res
-        .status(400)
-        .json({ message: "phone and password are required" });
 
     const result = await loginUser(String(phone), String(password));
     
@@ -27,7 +21,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   } catch (err) {
     // Map known errors to appropriate status codes
     const e: any = err;
-    if (e && e.code === "INVALID_CREDENTIALS")
+    if (e && e.code === 'INVALID_CREDENTIALS')
       return res.status(401).json({ message: "Invalid credentials" });
     return res
       .status(500)
@@ -42,11 +36,7 @@ export async function register(
 ) {
   try {
     const { name, email, phone, password } = req.body ?? {};
-    if (!name || !email || !phone || !password) {
-      return res
-        .status(400)
-        .json({ message: "name, email, phone and password are required" });
-    }
+    
 
     const created = await registerUser({
       name: String(name),
@@ -57,7 +47,7 @@ export async function register(
     return res.status(201).json(created);
   } catch (err) {
     const e: any = err;
-    if (e && e.code === "DUPLICATE")
+    if (e && e.code === 'DUPLICATE')
       return res.status(409).json({ message: "Phone already registered" });
     return res
       .status(500)

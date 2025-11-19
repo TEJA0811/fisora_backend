@@ -1,11 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "crypto";
-import type { User } from "../type/User.js";
+import type { User } from "../type/User.ts";
 import {
   AddUser,
   FindUserByPhone,
-  CreateRefreshToken,
+  saveRefreshToken,
   GetRefreshToken,
   RevokeRefreshToken,
 } from "../db/dummy.db.js";
@@ -76,7 +76,7 @@ export async function loginUser(phone: string, password: string) {
   // refresh token (stored server-side)
   const refreshToken = randomUUID();
   // store refresh token for 7 days (in seconds)
-  await CreateRefreshToken(user.id, refreshToken, 7 * 24 * 60 * 60);
+  await saveRefreshToken(user.id, refreshToken, 7 * 24 * 60 * 60);
 
   return {
     accessToken,
@@ -104,7 +104,7 @@ export async function refreshAccessToken(refreshToken: string) {
 
   // Issue a new refresh token
   const newRefreshToken = randomUUID();
-  await CreateRefreshToken(token.user_id, newRefreshToken, 7 * 24 * 60 * 60);
+  await saveRefreshToken(token.user_id, newRefreshToken, 7 * 24 * 60 * 60);
 
   const accessToken = jwt.sign({ id: token.user_id }, JWT_SECRET, {
     expiresIn: "15m",

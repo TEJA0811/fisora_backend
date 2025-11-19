@@ -1,8 +1,16 @@
 {
   "compilerOptions": {
     "types": ["node"],
-    "target": "ES2022",
-    "module": "NodeNext",
+    "target": "es2016",
+    "module": "nodenext",
+    "baseUrl": "./src" /* Specify the base directory to resolve non-relative module names. */,
+    "paths": {
+      "@/controllers/*": ["./controllers/*"],
+      "@/middleware/*": ["./middleware/*"],
+      "@/routes/*": ["./routes/*"],
+      "@/types/*": ["./types/*"],
+      "@/utils/*": ["./utils/*"],
+    },
     "outDir": "./dist",
     "rootDir": "./",
     "strict": true,

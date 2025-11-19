@@ -19,7 +19,7 @@ import {
   verifyOTP,
   refreshToken,
   logout,
-} from "../controllers/auth.controller.js";
+} from "../controllers/auth.controller";
 
 router.post("/login", loginValidation, login);
 

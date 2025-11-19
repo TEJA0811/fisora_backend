@@ -1,21 +1,10 @@
-import { type User } from "../type/User.js";
+import { type User } from "../type/User";
 import { randomUUID } from "crypto";
 
 // MySQL pool (initialized only if MYSQL_ENABLED)
 let pool: any = null;
 
-// Wait helper to avoid race if server receives requests before init completes
-async function ensurePoolReady(timeoutMs = 5000) {
-  const start = Date.now();
-  while (!pool) {
-    if (Date.now() - start > timeoutMs) {
-      console.error("Timed out waiting for DB pool to be ready");
-      throw new Error("Database connection not available");
-    }
-    // small delay
-    await new Promise((r) => setTimeout(r, 100));
-  }
-}
+
 async function initMySQL() {
   try {
     // dynamic import so project doesn't crash if mysql2 isn't installed
@@ -103,7 +92,7 @@ setTimeout(async () => {
 }, 1000); // wait 1 second for env vars to load
 
 export async function AddUser(user: User): Promise<void> {
-  await ensurePoolReady();
+
   try {
     const sql =
       "INSERT INTO users (id, name, email, phone, password, joined, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -117,7 +106,6 @@ export async function AddUser(user: User): Promise<void> {
       user.status,
     ];
     await pool.query(sql, params);
-    console.log(`✓ User created: ${user.name} (${user.id})`);
     return;
   } catch (err) {
     console.error("AddUser error:", err);
@@ -128,7 +116,7 @@ export async function AddUser(user: User): Promise<void> {
 export async function FindUserByPhone(
   phone: string
 ): Promise<User | undefined> {
-  await ensurePoolReady();
+
   try {
     console.log("Searching for phone number:", phone);
     const [rows] = await pool.query(
@@ -136,18 +124,20 @@ export async function FindUserByPhone(
       [phone]
     );
     console.log("Database response:", rows);
-    const r: any = Array.isArray(rows) && rows.length ? rows[0] : undefined;
-    console.log("Found user:", r ? "yes" : "no");
-    if (!r) return undefined;
+    const userDetails: any = Array.isArray(rows) && rows.length ? rows[0] : undefined;
+    console.log("Found user:", userDetails ? "yes" : "no");
+    if (!userDetails) return undefined;
     return {
-      id: String(r.id),
-      name: r.name,
-      email: r.email,
-      phone: r.phone,
-      password: r.password,
+      id: String(userDetails.id),
+      name: userDetails.name,
+      email: userDetails.email,
+      phone: userDetails.phone,
+      password: userDetails.password,
       joined:
-        r.joined instanceof Date ? r.joined.toISOString() : String(r.joined),
-      status: r.status as "created" | "verified",
+        userDetails.joined instanceof Date
+          ? userDetails.joined.toISOString()
+          : String(userDetails.joined),
+      status: userDetails.status as "created" | "verified",
     };
   } catch (err) {
     console.error("FindUserByPhone error:", err);
@@ -156,7 +146,7 @@ export async function FindUserByPhone(
 }
 
 export async function GetAllUsers(): Promise<User[]> {
-  await ensurePoolReady();
+
   try {
     const [rows] = await pool.query(
       "SELECT id, name, email, phone, password, joined, status FROM users"
@@ -177,12 +167,12 @@ export async function GetAllUsers(): Promise<User[]> {
   }
 }
 
-export async function CreateRefreshToken(
+export async function saveRefreshToken(
   userId: string,
   token: string,
   expiresIn: number
 ): Promise<void> {
-  await ensurePoolReady();
+
   try {
     const id = randomUUID();
     const expires = new Date(Date.now() + expiresIn * 1000);
@@ -191,13 +181,13 @@ export async function CreateRefreshToken(
       [id, userId, token, expires]
     );
   } catch (err) {
-    console.error("CreateRefreshToken error:", err);
+    console.error("saveRefreshToken error:", err);
     throw err;
   }
 }
 
 export async function GetRefreshToken(token: string): Promise<any> {
-  await ensurePoolReady();
+ 
   try {
     const [rows] = await pool.query(
       "SELECT * FROM refresh_tokens WHERE token = ? AND revoked = FALSE AND expires > NOW() LIMIT 1",
@@ -211,7 +201,7 @@ export async function GetRefreshToken(token: string): Promise<any> {
 }
 
 export async function RevokeRefreshToken(token: string): Promise<void> {
-  await ensurePoolReady();
+
   try {
     await pool.query(
       "UPDATE refresh_tokens SET revoked = TRUE WHERE token = ?",
