@@ -1,4 +1,11 @@
 /node_modules
 /.DS_Store
-/dist
-/.env
+
+# Build output
+dist/
+
+# Environment
+.env
+
+# Misc
+*.log

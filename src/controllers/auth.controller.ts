@@ -1,52 +1,108 @@
 import { type Request, type Response, type NextFunction } from 'express';
 
-import jwt from 'jsonwebtoken'
-import { AddUser } from '../db/dummy.db.ts';
+import {
+  registerUser,
+  loginUser,
+  refreshAccessToken,
+  revokeRefreshToken,
+} from '../services/auth.service';
 
-import type { User } from '../type/User.ts';
+export async function login(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { phone, password } = req.body ?? {};
 
-export function isLogged(req: Request, res: Response, next: NextFunction) {
-    // TODO: implemente logic
-    // const token = req.headers.authorization?.split(' ')[1]; // Expecting "Bearer TOKEN"
-
-    // if (!token) {
-    //     return res.status(401).json({ message: 'No token provided' });
-    // }
-
-    // try {
-    //     const decoded = jwt.verify(token, 'your_secret_key'); // Replace 'your_secret_key'
-    //     req.user = decoded; // Attach user info to request
-    //     next();
-    // } catch (err) {
-    //     return res.status(401).json({ message: 'Invalid token' });
-    // }
-};
-
-export function login(req: Request, res: Response, next: NextFunction) {
-    // TODO: implement login logic here
+    const result = await loginUser(String(phone), String(password));
+    
+    return res.json({
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      user: result.user,
+    });
+  } catch (err) {
+    // Map known errors to appropriate status codes
+    const e: any = err;
+    if (e && e.code === 'INVALID_CREDENTIALS')
+      return res.status(401).json({ message: "Invalid credentials" });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: String(err) });
+  }
 }
 
-export function register(req: Request, res: Response, next: NextFunction) {
-    // TODO: implement register logic here
-    const user: User = {
-        id: "",
-        name: "",
-        joined: "",
-        password: "",
-        phone: "",
-        status: 'created'
-    }
-    AddUser(user)
+export async function register(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { name, email, phone, password } = req.body ?? {};
+    
+
+    const created = await registerUser({
+      name: String(name),
+      email: String(email),
+      phone: String(phone),
+      password: String(password),
+    });
+    return res.status(201).json(created);
+  } catch (err) {
+    const e: any = err;
+    if (e && e.code === 'DUPLICATE')
+      return res.status(409).json({ message: "Phone already registered" });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: String(err) });
+  }
 }
 
-export function changePassword(req: Request, res: Response, next: NextFunction) {
-    // TODO: implement change password logic here
+export function changePassword(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  // TODO: implement change password logic here (requires DB update)
+  return res.status(501).json({ message: "Not implemented" });
 }
 
 export function getOtp(req: Request, res: Response, next: NextFunction) {
-    // TODO: implement generate otp logic here
+  // TODO: implement generate otp logic here
+  return res.status(501).json({ message: "Not implemented" });
 }
 
 export function verifyOTP(req: Request, res: Response, next: NextFunction) {
-    // TODO: implement otp verification logic here
+  // TODO: implement otp verification logic here
+  return res.status(501).json({ message: "Not implemented" });
+}
+
+export async function refreshToken(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { refreshToken } = req.body;
+    const r = await refreshAccessToken(String(refreshToken));
+    return res.json(r);
+  } catch (err) {
+    const e: any = err;
+    if (e && e.code === "INVALID_REFRESH")
+      return res.status(401).json({ message: "Invalid refresh token" });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: String(err) });
+  }
+}
+
+export async function logout(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken)
+      return res.status(400).json({ message: "refreshToken is required" });
+    await revokeRefreshToken(String(refreshToken));
+    return res.json({ message: "Logged out" });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: String(err) });
+  }
 }
