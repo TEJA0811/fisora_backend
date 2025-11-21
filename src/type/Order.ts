@@ -1,10 +1,2 @@
-export interface Order {
-    id: string;
-    userId: string; // userId
-    itemId: string; //
-    quantity: number;
-    price: string;
-    orderAt: string;
-    status: 'pending' | 'accepted' | 'declined' | 'onaway' | 'delivered'
-    deliverdAt?: string
-}
+// Re-export Prisma Order type for compatibility.
+export type Order = import('@prisma/client').Order

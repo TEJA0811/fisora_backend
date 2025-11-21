@@ -9,3 +9,5 @@ dist/
 
 # Misc
 *.log
+
+/generated/prisma

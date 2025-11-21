@@ -1,10 +1,2 @@
-export interface FishItem {
-    id: string;
-    name: string;
-    price: number;
-    minimum: number;
-    unit: string;
-    description: string;
-    uses: string;
-    offer: string;
-}
+// Re-export Prisma FishItem type for compatibility.
+export type FishItem = import('@prisma/client').FishItem

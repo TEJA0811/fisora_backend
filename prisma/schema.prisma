@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FishItem {
+  id          String  @id
+  name        String
+  price       Float
+  minimum     Int
+  unit        String
+  description String
+  uses        String
+  offer       String
+  Order       Order[]
+}
+
+model Order {
+  id         String      @id
+  userId     String
+  itemId     String
+  quantity   Int
+  price      String
+  orderAt    DateTime    @default(now())
+  status     OrderStatus @default(pending)
+  deliverdAt DateTime?
+  FishItem   FishItem    @relation(fields: [itemId], references: [id])
+  User       User        @relation(fields: [userId], references: [id])
+}
+
+model RefreshToken {
+  id        String    @id
+  userId    String
+  token     String    @unique
+  expires   DateTime?
+  revoked   Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  User      User      @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id           String         @id
+  name         String
+  phone        String         @unique
+  email        String         @unique
+  password     String
+  joined       DateTime       @default(now())
+  status       UserStatus     @default(created)
+  Order        Order[]
+  RefreshToken RefreshToken[]
+}
+
+enum OrderStatus {
+  pending
+  accepted
+  declined
+  onaway
+  delivered
+}
+
+enum UserStatus {
+  created
+  verified
+}

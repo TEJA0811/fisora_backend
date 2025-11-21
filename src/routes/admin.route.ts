@@ -1,4 +1,4 @@
-import express from "express";
+import express, { type Request, type Response, type NextFunction } from "express";
 import { isLogged } from "../middleware/auth.middleware";
 
 const router = express.Router();
@@ -24,7 +24,7 @@ router.delete("/fish", isLogged, (req, res) => {
 });
 
 // middleware that is specific to this router
-const timeLog = (req: any, res: any, next: any) => {
+const timeLog = (req: Request, res: Response, next: NextFunction) => {
   console.log("Time: ", Date.now());
   next();
 };

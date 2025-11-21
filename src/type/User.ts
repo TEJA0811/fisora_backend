@@ -1,9 +1,4 @@
-export interface User {
-    id: string;
-    name: string;
-    phone: string;
-    email: string;
-    password: string;
-    joined: string;
-    status: 'created' | 'verified'
-}
+// Re-export Prisma User type for compatibility while migrating away from
+// handwritten interfaces. After `npx prisma generate`, `@prisma/client` will
+// export the `User` type.
+export type User = import('@prisma/client').User
