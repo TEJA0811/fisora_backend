@@ -1,11 +1,13 @@
-#NOTE: This repository is a fork of a private/internal project that I originally contributed to extensively.
-I created this fork only for the purpose of showcasing my work publicly during interviews.
+# NOTE: This repository is a fork of a private/internal project that I originally contributed to extensively.
+# I created this fork only for the purpose of showcasing my work publicly during interviews (Almedia).
 
-✔ I was the main contributor to the original project.
-✔ All code, features, and documentation in this fork represent my own work.
-✔ Sensitive or proprietary parts have been removed/refactored to make the project shareable.
+# ✔ I was the main contributor to the original project.
+# ✔ All code, features, and documentation in this fork represent my own work.
+# ✔ Sensitive or proprietary parts have been removed/refactored to make the project shareable.
 
-If you have any questions about specific modules or design decisions, I’ll be happy to explain them during the interview.
+# If you have any questions about specific modules or design decisions, I’ll be happy to explain them during the interview.
+
+
 # 🐟 Fishora - Fish Order Management System
 
 A complete backend API for managing fish sales, orders, and admin operations with role-based authentication.
