@@ -1,34 +1,93 @@
-import express, { type Request, type Response, type NextFunction } from "express";
-import { isLogged } from "../middleware/auth.middleware";
+import express from "express";
+import { isAdmin } from "../middleware/admin.middleware";
+import {
+  adminLoginValidation,
+  addFishValidation,
+  updateFishValidation,
+  deleteFishValidation,
+  updateOrderStatusValidation,
+  changePasswordValidation,
+} from "../middleware/validation/admin.validation";
+import {
+  adminLogin,
+  addFish,
+  updateFish,
+  deleteFish,
+  getFishList,
+  getOrders,
+  updateOrderStatus,
+  changePassword,
+} from "../controllers/admin.controller";
 
 const router = express.Router();
 
-router.post("/admin_login", (req, res) => {
-  res.send("login");
-});
+// PUBLIC ADMIN ROUTES (No auth required)
+/**
+ * @route   POST /admin/login
+ * @desc    Admin login
+ * @access  Public
+ */
+router.post("/admin/login", adminLoginValidation, adminLogin);
 
-router.post("/admin_change_password", (req, res) => {
-  res.send("change_password");
-});
+// PROTECTED ADMIN ROUTES (Admin auth required)
 
-router.post("/add_fish", isLogged, (req, res) => {
-  res.send("add_fish");
-});
+/**
+ * @route   GET /admin/fish
+ * @desc    Get all fish items
+ * @access  Admin only
+ */
+router.get("/admin/fish", isAdmin, getFishList);
 
-router.post("/update_fish", isLogged, (req, res) => {
-  res.send("update_fish");
-});
+/**
+ * @route   POST /admin/fish
+ * @desc    Add new fish item
+ * @access  Admin only
+ */
+router.post("/admin/fish", isAdmin, addFishValidation, addFish);
 
-router.delete("/fish", isLogged, (req, res) => {
-  res.send("delete fish");
-});
+/**
+ * @route   PUT /admin/fish/:id
+ * @desc    Update fish item
+ * @access  Admin only
+ */
+router.put("/admin/fish/:id", isAdmin, updateFishValidation, updateFish);
 
-// middleware that is specific to this router
-const timeLog = (req: Request, res: Response, next: NextFunction) => {
-  console.log("Time: ", Date.now());
-  next();
-};
+/**
+ * @route   DELETE /admin/fish/:id
+ * @desc    Delete fish item
+ * @access  Admin only
+ */
+router.delete("/admin/fish/:id", isAdmin, deleteFishValidation, deleteFish);
 
-router.use(timeLog);
+/**
+ * @route   GET /admin/orders
+ * @desc    Get all orders
+ * @access  Admin only
+ */
+router.get("/admin/orders", isAdmin, getOrders);
+
+/**
+ * @route   PATCH /admin/orders/:id/status
+ * @desc    Update order status
+ * @access  Admin only
+ */
+router.patch(
+  "/admin/orders/:id/status",
+  isAdmin,
+  updateOrderStatusValidation,
+  updateOrderStatus
+);
+
+/**
+ * @route   POST /admin/change-password
+ * @desc    Change admin password
+ * @access  Admin only
+ */
+router.post(
+  "/admin/change-password",
+  isAdmin,
+  changePasswordValidation,
+  changePassword
+);
 
 export default router;

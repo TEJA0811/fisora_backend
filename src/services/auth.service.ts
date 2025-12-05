@@ -9,7 +9,7 @@ import {
   GetRefreshToken,
   RevokeRefreshToken,
 } from "../db/prisma.db";
-import type { Prisma, User as PrismaUser, RefreshToken as PrismaRefreshToken } from "@prisma/client";
+import type { Prisma, User as PrismaUser, RefreshToken as PrismaRefreshToken } from '@prisma/client';
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 

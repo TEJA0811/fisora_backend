@@ -50,6 +50,7 @@ model User {
   password     String
   joined       DateTime       @default(now())
   status       UserStatus     @default(created)
+  role         UserRole       @default(user)
   Order        Order[]
   RefreshToken RefreshToken[]
 }
@@ -65,4 +66,9 @@ enum OrderStatus {
 enum UserStatus {
   created
   verified
+}
+
+enum UserRole {
+  user
+  admin
 }
