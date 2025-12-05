@@ -16,8 +16,12 @@ export async function isLogged(
   const token = auth.split(" ")[1];
   try {
     const secret = process.env.JWT_SECRET || "dev_secret";
-    const decoded = jwt.verify(token, secret) as any;
-    (req as any).userId = decoded.id;
+    const decoded = jwt.verify(token, secret) as jwt.JwtPayload | string;
+    if (typeof decoded === "object" && decoded && "id" in decoded) {
+      (req as Request & { userId?: string }).userId = String((decoded as jwt.JwtPayload).id);
+      return next();
+    }
+    return res.status(401).json({ message: "Invalid or expired token" });
     next();
   } catch (err) {
     return res.status(401).json({ message: "Invalid or expired token" });

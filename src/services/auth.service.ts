@@ -1,14 +1,15 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "crypto";
-import type { User } from "../type/User.ts";
+// We're using Prisma models for DB types. Avoid importing local DTO interfaces here.
 import {
   AddUser,
   FindUserByPhone,
-  saveRefreshToken,
+  CreateRefreshToken,
   GetRefreshToken,
   RevokeRefreshToken,
-} from "../db/dummy.db.js";
+} from "../db/prisma.db";
+import type { Prisma, User as PrismaUser, RefreshToken as PrismaRefreshToken } from '@prisma/client';
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
@@ -23,47 +24,50 @@ export async function registerUser(payload: {
   // check duplicate
   const existing = await FindUserByPhone(phone);
   if (existing) {
-    const err: any = new Error("Phone already registered");
+    const err = new Error("Phone already registered") as Error & { code?: string };
     err.code = "DUPLICATE";
     throw err;
   }
 
   const hashed = await bcrypt.hash(String(password), 10);
 
-  const user: User = {
+  const userData: Prisma.UserCreateInput = {
+    // Build DB payload (let Prisma set defaults like joined)
     id: randomUUID(),
     name: String(name),
     email: String(email),
-    joined: new Date().toISOString(),
     password: hashed,
     phone: String(phone),
-    status: "created",
-  };
+    status: "created" as const,
+  } as Prisma.UserCreateInput;
 
-  await AddUser(user);
+  const created = await AddUser(userData);
 
-  // Return public user fields
+  // Return public user fields (map Date -> ISO string)
   return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    joined: user.joined,
-    status: user.status,
+    id: created.id,
+    name: created.name,
+    email: created.email,
+    phone: created.phone,
+    joined:
+      created.joined instanceof Date
+        ? created.joined.toISOString()
+        : String(created.joined),
+    status: created.status,
   };
 }
 
 export async function loginUser(phone: string, password: string) {
   const user = await FindUserByPhone(String(phone));
   if (!user) {
-    const err: any = new Error("Invalid credentials");
+    const err = new Error("Invalid credentials") as Error & { code?: string };
     err.code = "INVALID_CREDENTIALS";
     throw err;
   }
 
   const match = await bcrypt.compare(String(password), user.password);
   if (!match) {
-    const err: any = new Error("Invalid credentials");
+    const err = new Error("Invalid credentials") as Error & { code?: string };
     err.code = "INVALID_CREDENTIALS";
     throw err;
   }
@@ -76,7 +80,7 @@ export async function loginUser(phone: string, password: string) {
   // refresh token (stored server-side)
   const refreshToken = randomUUID();
   // store refresh token for 7 days (in seconds)
-  await saveRefreshToken(user.id, refreshToken, 7 * 24 * 60 * 60);
+  await CreateRefreshToken(user.id, refreshToken, 7 * 24 * 60 * 60);
 
   return {
     accessToken,
@@ -94,7 +98,7 @@ export async function loginUser(phone: string, password: string) {
 export async function refreshAccessToken(refreshToken: string) {
   const token = await GetRefreshToken(refreshToken);
   if (!token) {
-    const err: any = new Error("Invalid refresh token");
+    const err = new Error("Invalid refresh token") as Error & { code?: string };
     err.code = "INVALID_REFRESH";
     throw err;
   }
@@ -104,9 +108,9 @@ export async function refreshAccessToken(refreshToken: string) {
 
   // Issue a new refresh token
   const newRefreshToken = randomUUID();
-  await saveRefreshToken(token.user_id, newRefreshToken, 7 * 24 * 60 * 60);
+  await CreateRefreshToken(token.userId, newRefreshToken, 7 * 24 * 60 * 60);
 
-  const accessToken = jwt.sign({ id: token.user_id }, JWT_SECRET, {
+  const accessToken = jwt.sign({ id: token.userId }, JWT_SECRET, {
     expiresIn: "15m",
   });
   return { accessToken, refreshToken: newRefreshToken };

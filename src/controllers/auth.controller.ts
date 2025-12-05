@@ -20,7 +20,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     });
   } catch (err) {
     // Map known errors to appropriate status codes
-    const e: any = err;
+    const e = err as { code?: string; message?: string };
     if (e && e.code === 'INVALID_CREDENTIALS')
       return res.status(401).json({ message: "Invalid credentials" });
     return res
@@ -46,7 +46,7 @@ export async function register(
     });
     return res.status(201).json(created);
   } catch (err) {
-    const e: any = err;
+    const e = err as { code?: string; message?: string };
     if (e && e.code === 'DUPLICATE')
       return res.status(409).json({ message: "Phone already registered" });
     return res
@@ -84,7 +84,7 @@ export async function refreshToken(
     const r = await refreshAccessToken(String(refreshToken));
     return res.json(r);
   } catch (err) {
-    const e: any = err;
+    const e = err as { code?: string; message?: string };
     if (e && e.code === "INVALID_REFRESH")
       return res.status(401).json({ message: "Invalid refresh token" });
     return res
